@@ -10,7 +10,7 @@ Configuration lives in **`init.sh`** (sourced by **`backup.sh`** and **`restore.
 
 - **`DOTFILES`** — copied into **`backup/`** (files and directories under `$HOME`).
 - **`~/.config`** — rsync’d into **`backup/.config/`**, with excludes listed in **`backup.sh`** (`CONFIG_RSYNC_EXCLUDES`).
-- **`SOPS`** — each path under `$HOME` is encrypted with [SOPS](https://github.com/getsops/sops) + age into **`sops/`** (single files as `path.enc`; directories are one `.enc` per file, mirroring the tree).
+- **`SOPS`** — each path under `$HOME` is encrypted with [SOPS](https://github.com/getsops/sops) + age into **`sops/`** (single files as `path.enc`; directories are one `.enc` per file, mirroring the tree). The **`sops/`** tree is **not** deleted on each backup: existing ciphertext is reused when the plaintext file’s SHA-256 matches **`sops/.plaintext-sha256`**, so Git does not pick up spurious ciphertext churn from re-encrypting unchanged files.
 - **`backup/nonbrew-applications.txt`** — paths of **`.app`** bundles in **`/Applications`** and **`~/Applications`** that do not resolve under Homebrew **Caskroom/Cellar** and are not **`com.apple.*`**. Built by **`record_nonbrew_applications`** in **`modules/nonbrew-apps.sh`**; **`restore.sh`** calls **`show_nonbrew_applications`** after SOPS. Heuristic only.
 
 Secrets and paths currently in **`SOPS`** include things like **`.ssh`**, **`.netrc`**, **kube/docker** config, **`.claude.json`**, **`.cursor/mcp.json`**, **ACME** dirs under **`.acme.sh`**, **`.secrets`**, **`.zsh_history`**, etc. Adjust the arrays in **`init.sh`** to match what you want.
@@ -31,8 +31,14 @@ You need the **[1Password CLI](https://developer.1password.com/docs/cli/)** (`op
 ```sh
 cd /path/to/macos-personal
 ./backup.sh    # refresh backup/ and sops/
+./backup.sh --force-sops   # re-encrypt every SOPS file (ignore hash registry)
+./backup.sh --init-sops-registry   # hash plaintext only; write sops/.plaintext-sha256 and exit (no backup, no encrypt)
 ./restore.sh   # install tooling and restore home + decrypt sops
 ```
+
+**SOPS hash registry:** **`sops/.plaintext-sha256`** is a sorted TSV (`path-under-home<TAB>sha256`). It is safe to commit in a **private** repo; it does not contain secrets, but fixed paths plus hashes can still hint what exists—treat like the rest of the repo.
+
+**Bootstrap:** After cloning or changing this logic, run **`./backup.sh --init-sops-registry`** once (from repo root) so the registry matches your current plaintext files; then normal **`./backup.sh`** can skip re-encryption where ciphertext already exists and plaintext is unchanged.
 
 Or use **`make`** from anywhere:
 
@@ -78,7 +84,7 @@ From the repo root, with **`op`** authenticated and **Homebrew** available (for 
 # or: make backup
 ```
 
-To change what is included, edit **`init.sh`** (`DOTFILES`, `SOPS`) and **`backup.sh`** (`CONFIG_RSYNC_EXCLUDES`). You can also edit **`backup/Brewfile`** by hand or trim it after `brew bundle dump`.
+To change what is included, edit **`init.sh`** (`DOTFILES`, `SOPS`) and **`backup.sh`** (`CONFIG_RSYNC_EXCLUDES`). You can also edit **`backup/Brewfile`** by hand or trim it after `brew bundle dump`. If you add a new **`SOPS`** path and the corresponding **`.enc`** is missing, backup encrypts it once; the registry is rewritten each run with current hashes.
 
 ## Credit
 
