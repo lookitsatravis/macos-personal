@@ -14,15 +14,14 @@ RESET='\033[0m'
 ARROW="${MAGENTA}==> ${RESET}"
 
 # Path Variables
-# Path for all backups
-BACKUP_DIR="./backup"
-SOPS_DIR="./sops"
+# Path for current script (repo root when init.sh lives at repo root)
+SCRIPT_DIR=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
+# Absolute paths so backup/restore work even if cwd changes mid-run.
+BACKUP_DIR="$SCRIPT_DIR/backup"
+SOPS_DIR="$SCRIPT_DIR/sops"
 
 # Path for macOS Preferences
 PREFERENCES_DIR="$HOME/Library/Preferences"
-
-# Path for current script
-SCRIPT_DIR=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
 
 # Dotfiles to backup
 DOTFILES=(

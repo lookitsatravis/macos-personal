@@ -69,13 +69,16 @@ for dotfile in "${DOTFILES[@]}"; do
         continue
     fi
 
-    # if entry is nested in a directory, create directory and copy
-    if [ ! -d $BACKUP_DIR/$(dirname $dotfile) ]; then
-        mkdir -p $BACKUP_DIR/$(dirname $dotfile)
-    fi
-
-    cp -f ~/$dotfile $BACKUP_DIR/$dotfile
+    mkdir -p "$(dirname "$BACKUP_DIR/$dotfile")"
+    cp -f "$HOME/$dotfile" "$BACKUP_DIR/$dotfile"
 done
+
+# Cursor's .gitignore uses '*' without un-ignoring argv.json / .gitignore, so Git would
+# skip them on clone. Re-append negations after copy from $HOME (idempotent).
+if [[ -f "$BACKUP_DIR/.cursor/.gitignore" ]]; then
+    grep -qxF '!.gitignore' "$BACKUP_DIR/.cursor/.gitignore" || echo '!.gitignore' >>"$BACKUP_DIR/.cursor/.gitignore"
+    grep -qxF '!argv.json' "$BACKUP_DIR/.cursor/.gitignore" || echo '!argv.json' >>"$BACKUP_DIR/.cursor/.gitignore"
+fi
 
 if [[ -n "${SOPS_AGE_RECIPIENT:-}" ]]; then
     echo -e "${ARROW}Using age recipient from init.sh (SOPS_AGE_RECIPIENT)."
