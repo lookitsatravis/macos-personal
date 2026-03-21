@@ -12,10 +12,12 @@ for dotfile in "${DOTFILES[@]}"; do
         continue
     fi
 
-    # if entry is a directory, copy recursively
+    # Directory: merge into $HOME like backup.sh (trailing slashes). Using cp -R would nest
+    # (e.g. ~/bin/bin) if the destination dir already exists — common on macOS/BSD.
     if [[ -d "$BACKUP_DIR/$dotfile" ]]; then
         mkdir -p "$(dirname "$HOME/$dotfile")"
-        cp -R "$BACKUP_DIR/$dotfile" "$HOME/$dotfile"
+        mkdir -p "$HOME/$dotfile"
+        rsync -ax --exclude='.DS_Store' "$BACKUP_DIR/$dotfile/" "$HOME/$dotfile/"
         continue
     fi
 
