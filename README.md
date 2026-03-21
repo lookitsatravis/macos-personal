@@ -39,9 +39,14 @@ Or use **`make`** from anywhere:
 ```sh
 make -C /path/to/macos-personal backup
 make -C /path/to/macos-personal restore
+make -C /path/to/macos-personal brew-cleanup   # optional; see below
 ```
 
-Running **`make`** with no target runs **`help`** and prints those commands (it does not run backup).
+Running **`make`** with no target runs **`help`** and prints available targets (it does not run backup).
+
+### Prune Homebrew to match the Brewfile
+
+**`make brew-cleanup`** runs **`brew bundle cleanup --force`** against **`backup/Brewfile`**, uninstalling formulae and casks that are **not** listed there. Anything you still use must appear in that file or it will be removed. Run **`brew bundle check --file=backup/Brewfile`** first if you want to see drift without uninstalling.
 
 ## New machine checklist
 
