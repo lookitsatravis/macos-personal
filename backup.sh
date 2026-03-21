@@ -137,6 +137,11 @@ done
 rsync "${rsync_args[@]}" ~/.config "$BACKUP_DIR/"
 
 for dotfile in "${DOTFILES[@]}"; do
+    if [[ ! -e "$HOME/$dotfile" ]]; then
+        echo -e "${YELLOW}Skipping backup (missing): $dotfile${RESET}"
+        continue
+    fi
+
     echo -e "${ARROW}Backing up $dotfile..."
 
     # if entry is a directory, copy recursively (omit Finder metadata)

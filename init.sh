@@ -32,6 +32,7 @@ DOTFILES=(
     ".cursor/skills-cursor"
     ".gitconfig"
     ".p10k.zsh"
+    ".zprofile"
     ".zshrc"
 )
 
