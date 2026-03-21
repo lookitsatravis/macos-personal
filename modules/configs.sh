@@ -13,12 +13,8 @@ for dotfile in "${DOTFILES[@]}"; do
         continue
     fi
 
-    # if entry is nested in a directory, create directory and copy
-    if [ ! -d $(dirname $HOME/$dotfile) ]; then
-        mkdir -p $(dirname $HOME/$dotfile)
-    fi
-
-    cp -f $BACKUP_DIR/$dotfile ~/$dotfile
+    mkdir -p "$(dirname "$HOME/$dotfile")"
+    cp -f "$BACKUP_DIR/$dotfile" "$HOME/$dotfile"
 done
 
 # Developer folder for projects
