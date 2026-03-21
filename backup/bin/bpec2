@@ -1,0 +1,3 @@
+#!/bin/bash
+
+aws ec2 describe-instances | jq '.Reservations[] | {tags: .Instances[].Tags, ip: .Instances[].PrivateIpAddress} | [select(.tags[].Value == "bp-redux-prod-2-1")] | first(.[].ip)'  | sed 's/\"//g'

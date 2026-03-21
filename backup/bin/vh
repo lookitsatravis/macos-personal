@@ -1,0 +1,198 @@
+#!/bin/bash
+
+WORLD_NAME=HouseOfYeet # OdinsBeardCrust
+command=status
+
+if [ "$VALHEIM_WORLDNAME" = "" ] ; then
+    WORLD_NAME=$WORLD_NAME
+else
+    WORLD_NAME=$VALHEIM_WORLDNAME
+fi
+
+SERVER_IP=137.184.21.52
+SERVER_PORT=2459 # 2456
+SERVER_USER=root
+WORLD_PASSWORD=fuccboi
+BACKUPS_DIR="/Users/travisvignon/Google Drive/My Drive/Valheim/Backups/Worlds/${WORLD_NAME}"
+REMOTE_BACKUPS_DIR="/home/steam/backups/${WORLD_NAME}/"
+REMOTE_SCRIPT_DIR=/opt/Dedicated_Valheim_Server_Script
+REMOTE_SCRIPT_PATH=./njordmenu.sh
+
+function send_ssh_command() {
+    if [ "${command}" = "" ] ; then  help ; fi
+    if [ "$1" = "" ] ; then echo "Running \"${command}\" command on server ${SERVER_IP}..." ; fi
+    ssh "${SERVER_USER}@${SERVER_IP}" -tq "cd ${REMOTE_SCRIPT_DIR} && yes | sudo VALHEIM_WORLDNAME=${WORLD_NAME} ${REMOTE_SCRIPT_PATH} ${command}"
+}
+
+NOCOLOR='\033[0m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+ORANGE='\033[0;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+LIGHTRED='\033[1;31m'
+LIGHTGREEN='\033[1;32m'
+YELLOW='\033[1;33m'
+WHITE='\033[1;37m'
+clear='\e[0m'
+##
+# Color Functions
+##
+ColorRed(){ 
+    echo -ne $RED$1$NOCOLOR 
+}
+ColorGreen(){
+    echo -ne $GREEN$1$NOCOLOR
+}
+ColorOrange(){
+	echo -ne $ORANGE$1$NOCOLOR
+}
+ColorBlue(){
+	echo -ne $BLUE$1$NOCOLOR
+}
+ColorPurple(){
+	echo -ne $PURPLE$1$NOCOLOR
+}
+ColorCyan(){
+	echo -ne $CYAN$1$NOCOLOR
+}
+ColorLightRed(){
+	echo -ne $LIGHTRED$1$NOCOLOR
+}
+ColorLightGreen(){
+	echo -ne $LIGHTGREEN$1$NOCOLOR
+}
+ColorYellow(){
+	echo -ne $LIGHTYELLOW$1$NOCOLOR
+}
+ColorWhite(){
+	echo -ne $WHITE$1$NOCOLOR
+}
+
+function trim() {
+    local var="$*"
+    # remove leading whitespace characters
+    var="${var#"${var%%[![:space:]]*}"}"
+    # remove trailing whitespace characters
+    var="${var%"${var##*[![:space:]]}"}"   
+    printf '%s' "$var"
+}
+
+function help() {
+    clear
+
+    command=version
+    # VALHEIM_INSTALLED_VERSION=$(send_ssh_command 'false' | tail -n1 | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g')
+    VALHEIM_INSTALLED_VERSION=$(send_ssh_command 'false' | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g' | tail -n1)
+
+    command=release_version
+    # VALHEIM_RELEASE_VERSION=$(send_ssh_command 'false' | tail -n1 | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g')
+    VALHEIM_RELEASE_VERSION=$(send_ssh_command 'false' | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g' | tail -n1)
+
+    REQUIRES_UPDATE=""
+    if [ "$VALHEIM_INSTALLED_VERSION" != "$VALHEIM_RELEASE_VERSION" ] ; then REQUIRES_UPDATE=" (Update to version $(trim "$VALHEIM_RELEASE_VERSION") available!)" ; fi
+
+    cat <<EOF
+ ██▒   █▓ ▄▄▄       ██▓     ██░ ██ ▓█████  ██▓ ███▄ ▄███▓
+▓██░   █▒▒████▄    ▓██▒    ▓██░ ██▒▓█   ▀ ▓██▒▓██▒▀█▀ ██▒
+ ▓██  █▒░▒██  ▀█▄  ▒██░    ▒██▀▀██░▒███   ▒██▒▓██    ▓██░
+  ▒██ █░░░██▄▄▄▄██ ▒██░    ░▓█ ░██ ▒▓█  ▄ ░██░▒██    ▒██ 
+   ▒▀█░   ▓█   ▓██▒░██████▒░▓█▒░██▓░▒████▒░██░▒██▒   ░██▒
+   ░ ▐░   ▒▒   ▓▒█░░ ▒░▓  ░ ▒ ░░▒░▒░░ ▒░ ░░▓  ░ ▒░   ░  ░
+   ░ ░░    ▒   ▒▒ ░░ ░ ▒  ░ ▒ ░▒░ ░ ░ ░  ░ ▒ ░░  ░      ░
+     ░░    ░   ▒     ░ ░    ░  ░░ ░   ░    ▒ ░░      ░   
+      ░        ░  ░    ░  ░ ░  ░  ░   ░  ░ ░         ░   
+     ░                                                   
+
+$(ColorCyan 'Valheim Version:') $(trim ${VALHEIM_INSTALLED_VERSION})$(if [ "$REQUIRES_UPDATE" != "" ] ; then echo -ne $RED${REQUIRES_UPDATE} ; fi)
+$(ColorCyan 'Server IP:') ${SERVER_IP}:${SERVER_PORT}
+$(ColorCyan 'World Name:') ${WORLD_NAME}
+$(ColorCyan 'Password:') ${WORLD_PASSWORD}
+$(ColorCyan 'Local Backups Dir:') ${BACKUPS_DIR}
+
+$(ColorOrange 'Please enter a valid argument:')
+
+    $(ColorGreen 'connect')             Establishes an SSH connection to the Valheim server
+    $(ColorGreen 'menu')                Runs the Valheim server management menu
+    $(ColorGreen 'start')               Starts the Valheim server
+    $(ColorGreen 'stop')                Stops the Valheim server
+    $(ColorGreen 'restart')             Restarts the Valheim server
+    $(ColorGreen 'update')              Checks for and applies updates to Valheim
+    $(ColorGreen 'backup')              Runs a server backup and then copies the backup files locally (restarts Valheim)
+    $(ColorGreen 'status')              Check the status of the Valheim server
+    $(ColorGreen 'logs')                Tail the remote service logs
+    $(ColorGreen 'ip')                  Output the IP of the Valheim server
+EOF
+    exit
+}
+
+function connect_to_valheim_server() {
+    ssh "${SERVER_USER}@${SERVER_IP}"
+}
+
+function start_valheim_server_menu() {
+    ssh "${SERVER_USER}@${SERVER_IP}" -t "cd ${REMOTE_SCRIPT_DIR} && VALHEIM_WORLDNAME=${WORLD_NAME} ${REMOTE_SCRIPT_PATH}"
+}
+
+function start_valheim_server() {
+    command=start
+    send_ssh_command
+}
+
+function stop_valheim_server() {
+    command=stop
+    send_ssh_command
+
+    # To permenantly disable: sudo systemctl disable valheimserver_OdinsBeardCrust.service
+}
+
+function restart_valheim_server() {
+    command=restart
+    send_ssh_command
+}
+
+function check_apply_server_updates_beta() {
+    command=update
+    send_ssh_command
+}
+
+function backup_world_data() {
+    command=backup
+    send_ssh_command
+    rsync -azP "${SERVER_USER}@${SERVER_IP}:${REMOTE_BACKUPS_DIR}" "${BACKUPS_DIR}"
+}
+
+function display_valheim_server_status() {
+    command=status
+    send_ssh_command
+}
+
+function tail_valheim_server_logs() {
+    today=$(date +"%Y-%m-%d")
+    ssh "${SERVER_USER}@${SERVER_IP}" -t "journalctl -u valheimserver_${WORLD_NAME}.service --since \"${today} 00:00:00\" --no-pager -f"
+}
+
+function show_ip() {
+    echo ${SERVER_IP}:${SERVER_PORT}
+}
+
+if [ $# = 0 ]; then
+    help
+else
+    case "$1" in
+    connect) connect_to_valheim_server ;;
+    menu)    start_valheim_server_menu ;;
+    start)   start_valheim_server ;;
+    stop)    stop_valheim_server  ;;
+    restart) restart_valheim_server ;;
+    update)  check_apply_server_updates_beta ;;
+    backup)  backup_world_data ;;
+    status)  display_valheim_server_status ;;
+    logs)    tail_valheim_server_logs ;;
+    ip)      show_ip ;;
+    *)
+        help
+        ;;
+    esac
+fi 

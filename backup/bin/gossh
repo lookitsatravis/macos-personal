@@ -1,0 +1,5 @@
+#! /bin/bash
+
+host_ip=$1
+
+ssh -L 5433:$host_ip:5433 -A ubuntu@54.173.15.7 -W $host_ip:22

@@ -1,0 +1,83 @@
+alias gs="git status"
+# alias gl="git log"
+alias gl="git log -n 15 --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+alias gcom="git checkout master"
+alias gaa="git add ."
+alias gc="git commit -m "
+alias gp="git push"
+alias nah="git reset --hard && git clean -df"
+
+alias aliasconfig="code ~/.aliases"
+alias projects="cd ~/Documents/Projects"
+alias back="cd -"
+alias lara="php artisan "
+alias cd..="cd .."
+alias plz='sudo `fc -n -l -1`'
+alias localip="ifconfig | grep 'inet ' | grep -v 127.0.0.1 | cut -d\   -f2"
+alias publicip="curl icanhazip.com" # Your public IP address
+alias diskspace="du -S | sort -n -r |less"
+alias todo='grep "FIXME" * ; grep "TODO" * ; grep "XXX" *'
+alias fuck='pkill -9'
+alias cat=bat
+
+# move to trash rather than deleting
+# alias rm="trash"
+
+function search() {
+  find . -iname "*$@*" | less;
+}
+
+function up {
+    if [[ "$#" < 1 ]] ; then
+        cd ..
+    else
+        CDSTR=""
+        for i in {1..$1} ; do
+            CDSTR="../$CDSTR"
+        done
+        cd $CDSTR
+    fi
+}
+
+alias mk="minikube"
+alias mkstart="mk start --vm-driver=hyperkit --image-repository=auto --container-runtime=containerd"
+alias mkstop="mk stop"
+alias mkk="mk kubectl --"
+alias mkkap="mk kubectl apply -f --"
+alias mkkak="mk kubectl apply -k --"
+alias k="kubectl"
+alias kcuse="k config use-context --"
+alias kcget="k config get-contexts"
+alias kap="k apply -f"
+alias kak="k apply -k ."
+
+function kex() {
+    k exec -it $@ -- bin/bash
+}
+
+function json() {
+    curl -s $@ | jq . | bat -l json
+}
+
+function findnm() {
+    find . -name "node_modules" -type d -prune
+}
+
+function nukenm() {
+   find . -name "node_modules" -type d -prune -exec rm -rf '{}' +
+}
+
+function guliat() {
+    git config user.name "Travis Vignon"
+    git config user.email "travis@lookitsatravis.com"
+}
+
+function gunasa() {
+    git config user.name "Travis Vignon"
+    git config user.email "travis.vignon@appdat.jsc.nasa.gov"
+}
+
+alias glregistry="docker login registry.appdat.jsc.nasa.gov -u travis.vignon -p $MRI_GITLAB_PAT"
+alias tg="terragrunt"
+alias tggraph="tg graph --draw-cycles | dot -Tpng > graph.png && open graph.png"
+alias tgviz="pyenv global 3.9 && blast-radius --serve . --port 5001"

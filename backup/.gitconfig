@@ -1,0 +1,11 @@
+[user]
+	name = Travis Vignon
+	email = travis@lookitsatravis.com
+	signingkey = 4DAF48B40863A12E5FB03A41D22A73CFAC52011A
+[init]
+	defaultBranch = main
+[commit]
+	gpgSign = false
+[gpg]
+	program = /usr/local/bin/gpg
+	format = openpgp

@@ -1,0 +1,31 @@
+{
+	"auths": {
+		"406139727947.dkr.ecr.us-east-1.amazonaws.com": {},
+		"registry.appdat.jsc.nasa.gov": {}
+	},
+	"credsStore": "ENC[AES256_GCM,data:DzCl0IS2Nw==,iv:RSUeCjRpp0zVr84uMXQkwav3bNCTEIFpNPgrOtAEtqA=,tag:2WdLj6C8ymDkjPoqt4gxOA==,type:str]",
+	"currentContext": "ENC[AES256_GCM,data:0y9JHwJkQEBCCkFRWg==,iv:DKzsKHUe4XCUknsIEUBI+8t82XWLn6fOHr0yQidB+a4=,tag:Shh46iAUNtKjbXMC6zYRWw==,type:str]",
+	"plugins": {
+		"debug": {
+			"hooks": "ENC[AES256_GCM,data:NOlMEg==,iv:lTxQJeQcHFtSmSjt0EjtnRl2y+BdkV9HNR47lAZiCxw=,tag:aInPiiJJleAv8MjYmap+hw==,type:str]"
+		},
+		"scout": {
+			"hooks": "ENC[AES256_GCM,data:PB61M5NSVs1sM/GAESqUiJo=,iv:bgQ0iwQ3pKdOINMI1jygEay4mmtPwXO2ZKnyFk/01vQ=,tag:76QEO0V1KbtupREqTp74+A==,type:str]"
+		}
+	},
+	"features": {
+		"hooks": "ENC[AES256_GCM,data:+JchHQ==,iv:nhawyZq1BgpWofMnYVV9gMX83sJngNQBRjl8MIStbc8=,tag:IMVOeSIJbuEU2MlY/vtqHw==,type:str]"
+	},
+	"sops": {
+		"age": [
+			{
+				"recipient": "age1ttqtd6th7cure5uh4kdf3xcujdeecwf58ewf0yz9qer5r4p8ffuq9z9hmg",
+				"enc": "-----BEGIN AGE ENCRYPTED FILE-----\nYWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBlMkNZTUJvaHdHeWdTQ1pH\nWDYwSUIwdWRSTmNxYndpVWtXYjcvb0cwZFcwCjRZSVI1d1hIZTYvaHlmdVZsMGhm\nc1o1ZDJZelozSGNNc2xpWUQ1cTNZRTQKLS0tIGZ3SXBDVmI3VkprMXlpZFg2aEYy\nYkVQaXJtNG1qcjBMUHowYXoralFCd2cKtymFpdRDBq7BghOc7TbuwA9/MYVJuIPQ\nHE3l4li1d4QxLJytWevms3sYncVs9xXj/lLoMdJ7FN0RNWFvxzYfSg==\n-----END AGE ENCRYPTED FILE-----\n"
+			}
+		],
+		"lastmodified": "2026-03-21T20:56:08Z",
+		"mac": "ENC[AES256_GCM,data:pqO0tM9GlkwcvHQsFegRn39pEYs5WzfyE4nUk+5FAabGBpaGkJ0DovPvKy+0M+R6dw14aJazjfVhpvNKfirKZRdRooXyEVDUEB5OGCH7vGcxAeebZcfYfJaZwcfMKcgLr4CxzZtwQfKMYOHAKmo67K3/M46TXg0xAhcrRUHpxUM=,iv:t879/OCTqSHXrcYSokrwnqUh1D1V6JKg3v0/CnRFYVk=,tag:LSfsOJelp4mTovnNv5pIqA==,type:str]",
+		"unencrypted_suffix": "_unencrypted",
+		"version": "3.12.2"
+	}
+}

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# bash --login '/Applications/Docker/Docker Quickstart Terminal.app/Contents/Resources/Scripts/start.sh'
+echo 'Docker for Mac is installed and in use.'
+docker -v
