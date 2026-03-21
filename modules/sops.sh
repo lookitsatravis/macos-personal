@@ -4,8 +4,27 @@
 echo "Please ensure that 1password has been setup and authenticated."
 read -p "Press enter to continue..."
 
+mkdir -p ~/.config/op
 chmod 700 ~/.config/op
-chmod 600 ~/.config/op/config
+# Created by `op` after sign-in; may not exist until first successful CLI use.
+[[ -f ~/.config/op/config ]] && chmod 600 ~/.config/op/config
+
+# Ciphertext is always JSON (sops -e output), but paths end in .enc so sops would
+# infer binary and fail. Match output format to the restored plaintext path.
+_sops_output_type_for() {
+    case "$1" in
+        *.json) echo json ;;
+        *.yaml | *.yml) echo yaml ;;
+        *) echo binary ;;
+    esac
+}
+
+_sops_decrypt_to() {
+    local encf="$1" target="$2"
+    local out_type
+    out_type=$(_sops_output_type_for "$target")
+    sops -d --input-type json --output-type "$out_type" "$encf" >"$target"
+}
 
 SOPS_AGE_KEY=$(op read "$SOPS_AGE_KEY_PASSWORD_PATH")
 if [[ -z "$SOPS_AGE_KEY" ]]; then
@@ -24,13 +43,13 @@ for sops in "${SOPS[@]}"; do
             target="${HOME}/${rel%.enc}"
             mkdir -p "$(dirname "$target")"
             echo -e "${ARROW}  -> ${rel%.enc}"
-            sops -d "$encf" >"$target"
+            _sops_decrypt_to "$encf" "$target"
             chmod 600 "$target"
         done
     elif [[ -f "$SOPS_DIR/$sops.enc" ]]; then
         echo -e "${ARROW}Decrypting $sops..."
         mkdir -p "$HOME/$(dirname "$sops")"
-        sops -d "$SOPS_DIR/$sops.enc" >"$HOME/$sops"
+        _sops_decrypt_to "$SOPS_DIR/$sops.enc" "$HOME/$sops"
         chmod 600 "$HOME/$sops"
     else
         echo -e "${YELLOW}Skipping SOPS (no ciphertext): ${sops}${RESET}"
