@@ -125,8 +125,18 @@ source ~/.aliases
 [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
 
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# Official installer: $NVM_DIR/nvm.sh. Homebrew: $(brew --prefix nvm)/nvm.sh (any prefix).
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+  \. "$NVM_DIR/nvm.sh"
+  [[ -s "$NVM_DIR/bash_completion" ]] && \. "$NVM_DIR/bash_completion"
+elif command -v brew >/dev/null 2>&1; then
+  _hb_nvm="$(brew --prefix nvm 2>/dev/null)"
+  if [[ -n "$_hb_nvm" && -s "$_hb_nvm/nvm.sh" ]]; then
+    \. "$_hb_nvm/nvm.sh"
+    [[ -s "$_hb_nvm/etc/bash_completion.d/nvm" ]] && \. "$_hb_nvm/etc/bash_completion.d/nvm"
+  fi
+  unset _hb_nvm
+fi
 
 # place this after nvm initialization!
 autoload -U add-zsh-hook
