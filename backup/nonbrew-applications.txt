@@ -79,7 +79,6 @@
 /Applications/The Unarchiver.app
 /Applications/Tower.app
 /Applications/Transmit.app
-/Applications/Twitch.app
 /Applications/Unity Hub.app
 /Applications/Unity/Hub/Editor/2020.3.18f1/Unity.app
 /Applications/Unity/Hub/Editor/2021.3.2f1/Unity.app
