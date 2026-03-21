@@ -24,6 +24,7 @@
 /Applications/Obsidian.app
 /Applications/Postman.app
 /Applications/Raspberry Pi Imager.app
+/Applications/Slack.app
 /Applications/Spotify.app
 /Applications/Steam.app
 /Applications/Tower.app
