@@ -6,7 +6,7 @@ ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 # even when restore added it to ~/.zprofile. Prepend standard install locations.
 export PATH := /opt/homebrew/bin:/usr/local/bin:$(PATH)
 
-.PHONY: help backup restore brew-install brew-cleanup
+.PHONY: help backup restore brew-install brew-cleanup rsync-pull
 
 help:
 	@echo "Targets:"
@@ -14,6 +14,7 @@ help:
 	@echo "  make restore       - bootstrap this Mac from backup"
 	@echo "  make brew-install  - brew bundle install from backup/Brewfile only"
 	@echo "  make brew-cleanup  - uninstall Homebrew formulae/casks not listed in backup/Brewfile (--force)"
+	@echo "  make rsync-pull MANIFEST=path/to/file [RSYNC_ARGS=...] - pull absolute paths over SSH (see scripts/rsync-from-remote.sh --help)"
 
 backup:
 	@cd "$(ROOT)" && ./backup.sh
@@ -26,3 +27,7 @@ brew-install:
 
 brew-cleanup:
 	@cd "$(ROOT)" && brew bundle cleanup --force --file="$(ROOT)backup/Brewfile"
+
+rsync-pull:
+	@test -n "$(MANIFEST)" || (echo "error: set MANIFEST=path/to/manifest file" >&2; exit 1)
+	@cd "$(ROOT)" && ./scripts/rsync-from-remote.sh $(RSYNC_ARGS) "$(MANIFEST)"
