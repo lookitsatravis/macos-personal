@@ -6,12 +6,13 @@ ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 # even when restore added it to ~/.zprofile. Prepend standard install locations.
 export PATH := /opt/homebrew/bin:/usr/local/bin:$(PATH)
 
-.PHONY: help backup restore brew-cleanup
+.PHONY: help backup restore brew-install brew-cleanup
 
 help:
 	@echo "Targets:"
 	@echo "  make backup        - refresh backup/ and sops/"
 	@echo "  make restore       - bootstrap this Mac from backup"
+	@echo "  make brew-install  - brew bundle install from backup/Brewfile only"
 	@echo "  make brew-cleanup  - uninstall Homebrew formulae/casks not listed in backup/Brewfile (--force)"
 
 backup:
@@ -19,6 +20,9 @@ backup:
 
 restore:
 	@cd "$(ROOT)" && ./restore.sh
+
+brew-install:
+	@cd "$(ROOT)" && brew bundle install --file="$(ROOT)backup/Brewfile"
 
 brew-cleanup:
 	@cd "$(ROOT)" && brew bundle cleanup --force --file="$(ROOT)backup/Brewfile"
