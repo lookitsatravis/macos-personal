@@ -7,9 +7,12 @@ Usage: rsync-from-remote.sh [options] MANIFEST
 
 Read MANIFEST (one absolute remote path per line; blank lines and # comments ignored)
 and rsync each path from USER@HOST over SSH to the same absolute path locally,
-unless --map rewrites the local prefix.
+unless --map rewrites the local prefix or --dest-root places that layout under a directory.
 
 SSH passwords are not accepted as flags; use SSH keys or type the password when ssh prompts.
+
+Paths with spaces or shell metacharacters need rsync with --protect-args (GNU rsync).
+Set RSYNC to a GNU rsync binary if needed (e.g. brew install rsync, then RSYNC=/opt/homebrew/opt/rsync/bin/rsync).
 
 Options:
   -H, --host HOST              Remote hostname or IP (else prompted)
@@ -18,6 +21,9 @@ Options:
   --map REMOTE_PREFIX:LOCAL_PREFIX
                                If a manifest path equals REMOTE_PREFIX or is under it,
                                replace that prefix with LOCAL_PREFIX for the local path
+  --dest-root DIR              After --map (if any), write under DIR using the same
+                               relative layout (e.g. /Users/a/P -> DIR/Users/a/P).
+                               Omit for default: use the computed absolute path as-is.
   -n, --dry-run                Pass --dry-run to rsync
   -h, --help                   Show this help
 EOF
@@ -31,6 +37,7 @@ PORT_EXPLICIT=0
 MAP_REMOTE=""
 MAP_LOCAL=""
 DRY_RUN=0
+DEST_ROOT=""
 MANIFEST=""
 
 while [[ $# -gt 0 ]]; do
@@ -63,6 +70,10 @@ while [[ $# -gt 0 ]]; do
                 echo "error: --map must use non-empty REMOTE_PREFIX and LOCAL_PREFIX" >&2
                 exit 1
             fi
+            shift 2
+            ;;
+        --dest-root)
+            DEST_ROOT="${2:?}"
             shift 2
             ;;
         -n | --dry-run)
@@ -128,6 +139,40 @@ else
     RSYNC_E="ssh -p $PORT"
 fi
 
+# Prefer GNU rsync when present so --protect-args keeps remote paths with spaces/special
+# chars from being split by the remote shell. Apple openrsync does not support it.
+pick_rsync_bin() {
+    local c h
+    if [[ -n "${RSYNC:-}" ]]; then
+        printf '%s\n' "$RSYNC"
+        return
+    fi
+    for c in /opt/homebrew/opt/rsync/bin/rsync /usr/local/opt/rsync/bin/rsync; do
+        [[ -x "$c" ]] || continue
+        h="$("$c" --help 2>&1)" || continue
+        if [[ "$h" == *protect-args* || "$h" == *separate-args* ]]; then
+            printf '%s\n' "$c"
+            return
+        fi
+    done
+    command -v rsync
+}
+
+rsync_supports_protect_args() {
+    local h
+    h="$("$1" --help 2>&1)" || return 1
+    [[ "$h" == *protect-args* || "$h" == *separate-args* ]]
+}
+
+RSYNC_BIN="$(pick_rsync_bin)"
+RSYNC_EXTRA=()
+if rsync_supports_protect_args "$RSYNC_BIN"; then
+    RSYNC_EXTRA+=(--protect-args)
+else
+    echo "warning: $RSYNC_BIN has no --protect-args; paths with spaces or shell metacharacters may fail." >&2
+    echo "warning: install GNU rsync (brew install rsync) or set RSYNC to its binary." >&2
+fi
+
 map_to_local() {
     local remote_path="$1"
     if [[ -n "$MAP_REMOTE" ]]; then
@@ -153,6 +198,10 @@ while IFS= read -r line || [[ -n "$line" ]]; do
     [[ "$trimmed" == \#* ]] && continue
 
     remote_path="$trimmed"
+    if [[ "$remote_path" == *$'\n'* || "$remote_path" == *$'\r'* ]]; then
+        echo "error: line $line_num: path must not contain newline or carriage return" >&2
+        exit 1
+    fi
     if [[ "$remote_path" != /* ]]; then
         echo "error: line $line_num: path must be absolute (start with /): $remote_path" >&2
         exit 1
@@ -168,13 +217,26 @@ while IFS= read -r line || [[ -n "$line" ]]; do
         exit 1
     fi
 
+    if [[ -n "$DEST_ROOT" ]]; then
+        local_path="${DEST_ROOT%/}/${local_path#/}"
+    fi
+    if [[ -z "$local_path" ]]; then
+        echo "error: line $line_num: local path is empty after --dest-root" >&2
+        exit 1
+    fi
+
     local_parent="$(dirname "$local_path")"
     mkdir -p "$local_parent"
 
+    # Build user@host:path as one module string without embedding $remote_path in one
+    # double-quoted expansion (so embedded " in paths cannot break the shell word).
+    remote_spec="${USER_NAME}@${HOST}:"
+    remote_spec+="${remote_path}"
+
     echo "==> $remote_path -> $local_path" >&2
     if [[ "$DRY_RUN" -eq 1 ]]; then
-        rsync -avhP --dry-run -e "$RSYNC_E" "${USER_NAME}@${HOST}:$remote_path" "$local_parent/"
+        "$RSYNC_BIN" "${RSYNC_EXTRA[@]}" -avhP --dry-run -e "$RSYNC_E" -- "$remote_spec" "${local_parent}/"
     else
-        rsync -avhP -e "$RSYNC_E" "${USER_NAME}@${HOST}:$remote_path" "$local_parent/"
+        "$RSYNC_BIN" "${RSYNC_EXTRA[@]}" -avhP -e "$RSYNC_E" -- "$remote_spec" "${local_parent}/"
     fi
 done <"$MANIFEST"
