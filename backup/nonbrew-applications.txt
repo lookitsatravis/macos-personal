@@ -3,31 +3,96 @@
 # (best-effort; manual installers and odd casks may be misclassified)
 
 /Applications/1Password.app
+/Applications/4K Live Wallpaper.app
+/Applications/4K Video Downloader.app
+/Applications/Adobe Acrobat DC/Acrobat Distiller.app
+/Applications/Adobe Acrobat DC/Adobe Acrobat.app
+/Applications/Adobe XD/Adobe XD.app
+/Applications/Backblaze.app
+/Applications/BackblazeRestore.app
+/Applications/Bark.app
+/Applications/Bridge.app
+/Applications/Cisco Webex Meetings.app
 /Applications/Claude.app
+/Applications/Corsair/iCUE.app
+/Applications/Corsair/iCUEUninstaller.app
 /Applications/CurseForge.app
 /Applications/Cursor.app
+/Applications/DaisyDisk.app
 /Applications/Discord.app
 /Applications/Docker.app
+/Applications/Dropbox.app
+/Applications/Epic Games Launcher.app
 /Applications/Figma.app
 /Applications/Firefox Developer Edition.app
+/Applications/Firefox.app
+/Applications/Focus.app
+/Applications/Freedom.app
 /Applications/FTB Electron App.app
+/Applications/Garmin Express.app
 /Applications/GeForceNOW.app
+/Applications/GIPHY CAPTURE.app
 /Applications/Google Chrome.app
+/Applications/Google Docs.app
+/Applications/Google Drive.app
+/Applications/Google Sheets.app
+/Applications/Google Slides.app
+/Applications/Grammarly Desktop.app
+/Applications/HandBrake.app
+/Applications/HP.app
+/Applications/Hue Sync.app
+/Applications/iD.app
 /Applications/iTerm.app
 /Applications/JetBrains Toolbox.app
+/Applications/Ledger Live.app
 /Applications/Loom.app
 /Applications/Magnet.app
+/Applications/Microsoft Excel.app
+/Applications/Microsoft Outlook.app
+/Applications/Microsoft PowerPoint.app
 /Applications/Microsoft Teams.app
+/Applications/Microsoft Word.app
 /Applications/Minecraft.app
+/Applications/Monokle.app
+/Applications/MultiMC.app
 /Applications/MuseScore 4.app
+/Applications/Native Instruments/Controller Editor/Controller Editor.app
 /Applications/Notion.app
 /Applications/Obsidian.app
+/Applications/OnyX.app
+/Applications/OpenVPN Connect/OpenVPN Connect.app
+/Applications/OpenVPN Connect/Uninstall OpenVPN Connect.app
+/Applications/Parallels Toolbox.app
 /Applications/Postman.app
 /Applications/Raspberry Pi Imager.app
+/Applications/RedisInsight.app
+/Applications/RemotePlay.app
+/Applications/Roblox.app
+/Applications/RobloxStudio.app
+/Applications/Sequel Pro.app
+/Applications/Shadow PC.app
 /Applications/Slack.app
 /Applications/Spotify.app
 /Applications/Steam.app
+/Applications/stim.app
+/Applications/Tailscale.app
+/Applications/Telegram.app
+/Applications/The Unarchiver.app
 /Applications/Tower.app
 /Applications/Transmit.app
+/Applications/Unity Hub.app
+/Applications/Unity/Hub/Editor/2020.3.18f1/Unity.app
+/Applications/Unity/Hub/Editor/2021.3.2f1/Unity.app
 /Applications/VirtualBox.app
 /Applications/Visual Studio Code.app
+/Applications/Visual Studio.app
+/Applications/Windows App.app
+/Applications/Zenflow.app
+/Applications/zoom.us.app
+/Users/travisvignon/Applications/Cities Skylines.app
+/Users/travisvignon/Applications/JetBrains Toolbox/Android Studio.app
+/Users/travisvignon/Applications/JetBrains Toolbox/DataGrip Early Access Program.app
+/Users/travisvignon/Applications/JetBrains Toolbox/DataGrip.app
+/Users/travisvignon/Applications/JetBrains Toolbox/IntelliJ IDEA Ultimate.app
+/Users/travisvignon/Applications/The First Tree.app
+/Users/travisvignon/Applications/Vampire Survivors.app

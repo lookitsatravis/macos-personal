@@ -18,8 +18,19 @@ source modules/nonbrew-apps.sh
 
 SOPS_REGISTRY="$SOPS_DIR/.plaintext-sha256"
 
+# Hash file bytes for change detection. JSON dotfiles are often rewritten with different
+# key order or whitespace (Claude, Cursor, Docker, etc.); canonicalize with jq so we only
+# re-encrypt when the structured content actually changes.
 plaintext_hash() {
-    shasum -a 256 <"$1" | awk '{print $1}'
+    local f="$1"
+    if [[ "$f" == *.json ]] && command -v jq >/dev/null 2>&1; then
+        local normalized
+        if normalized=$(jq -cS . "$f" 2>/dev/null); then
+            printf '%s\n' "$normalized" | shasum -a 256 | awk '{print $1}'
+            return
+        fi
+    fi
+    shasum -a 256 <"$f" | awk '{print $1}'
 }
 
 registry_get() {

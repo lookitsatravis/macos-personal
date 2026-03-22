@@ -1,0 +1,84 @@
+#! /usr/bin/env bash
+# Find and remove node_modules, .terragrunt, and .terraform directories under a given root.
+# Prompts once per match before deleting.
+
+set -eo pipefail
+
+usage() {
+  echo "Usage: $(basename "$0") [DIRECTORY]"
+  echo ""
+  echo "  Recursively find directories named: node_modules, .terragrunt, .terraform"
+  echo "  under DIRECTORY (default: current working directory)."
+  echo "  You are prompted for each path (y/yes to delete, anything else to skip)."
+  echo ""
+  echo "  Options:"
+  echo "    -h, --help    Show this help"
+  exit "${1:-0}"
+}
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  usage
+fi
+
+ROOT=${1:-.}
+if [[ ! -d "$ROOT" ]]; then
+  echo "Error: not a directory: $ROOT" >&2
+  exit 1
+fi
+ROOT=$(cd "$ROOT" && pwd)
+
+find_targets() {
+  find "$ROOT" "$@" -type d \( -name node_modules -o -name .terragrunt-cache -o -name .terraform -o -name .next -o -name venv -o -name .venv -o -name .pnpm-store -o -name cdk.out \) 2>/dev/null
+}
+
+list_matches() {
+  find_targets | LC_ALL=C sort
+}
+
+matches_file=$(mktemp)
+trap 'rm -f "$matches_file"' EXIT
+
+list_matches >"$matches_file"
+
+count=$(grep -c . "$matches_file" 2>/dev/null || true)
+if [[ -z "$count" || "$count" -eq 0 ]]; then
+  echo "No matching directories under: $ROOT"
+  exit 0
+fi
+
+echo "Found $count matching director(y/ies) under: $ROOT"
+echo "(node_modules, .terragrunt, .terraform)"
+echo "You will be asked about each one; answer y or yes to delete."
+echo ""
+
+removed=0
+skipped_user=0
+skipped_missing=0
+idx=0
+
+while IFS= read -r dir <&3; do
+  idx=$((idx + 1))
+  if [[ ! -d "$dir" ]]; then
+    echo "[$idx/$count] (already removed or missing — skipping)"
+    echo "    $dir"
+    skipped_missing=$((skipped_missing + 1))
+    continue
+  fi
+  echo "[$idx/$count] $dir"
+  # Match paths are read from fd 3 so stdin stays available for answers.
+  read -r -p "Delete this directory? [y/N] " reply || true
+  case "$reply" in
+    [yY] | [yY][eE][sS])
+      rm -rf "$dir"
+      removed=$((removed + 1))
+      echo "Deleted."
+      ;;
+    *)
+      skipped_user=$((skipped_user + 1))
+      echo "Skipped."
+      ;;
+  esac
+  echo ""
+done 3<"$matches_file"
+
+echo "Done. Deleted: $removed; skipped (you): $skipped_user; skipped (missing): $skipped_missing."
